@@ -110,14 +110,6 @@
     <div class="px-5 py-4 border-b border-gray-100">
         <h3 class="text-sm font-semibold text-gray-700">Detail Pesanan Selesai — {{ $months[$month] }} {{ $year }}</h3>
     </div>
-    @php
-        $completedOrders = \App\Models\Order::with('items.menu')
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            ->where('status', 'completed')
-            ->latest()->get();
-    @endphp
-
     {{-- Desktop: tabel --}}
     <div class="hidden md:block">
         <table class="w-full text-sm">

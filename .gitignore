@@ -3,6 +3,7 @@
 .env
 .env.backup
 .env.production
+.env.railway
 .phpactor.json
 .phpunit.result.cache
 /.codex
@@ -19,6 +20,7 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/app/google-credentials.json
 /vendor
 _ide_helper.php
 Homestead.json

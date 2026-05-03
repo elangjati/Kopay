@@ -70,6 +70,17 @@
                 <span class="text-sm text-gray-500">Menunggu pembayaran...</span>
             </div>
 
+            {{-- Expire countdown --}}
+            <div x-show="!paid" class="text-center mb-3">
+                <p class="text-xs text-gray-400">
+                    QR berlaku selama <span class="font-semibold text-gray-600" x-text="countdown"></span>
+                </p>
+            </div>
+            <div x-show="expired && !paid" class="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-4 text-center">
+                QR sudah expire.
+                <a href="{{ route('admin.kasir.create') }}" class="font-semibold underline">Buat pesanan baru</a>
+            </div>
+
             <div x-show="paid" class="flex items-center justify-center gap-2 mb-5 text-green-600">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
@@ -108,7 +119,22 @@
 function qrisPage() {
     return {
         paid: false,
+        expired: false,
+        countdown: '15:00',
         init() {
+            // Countdown 15 menit
+            let seconds = 15 * 60;
+            const timer = setInterval(() => {
+                seconds--;
+                const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const s = (seconds % 60).toString().padStart(2, '0');
+                this.countdown = `${m}:${s}`;
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    this.expired = true;
+                }
+            }, 1000);
+
             @if($order->qris_url && $order->status !== 'completed')
             this.poll();
             @endif

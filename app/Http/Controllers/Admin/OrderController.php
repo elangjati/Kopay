@@ -10,6 +10,15 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    public function today()
+    {
+        $orders = Order::with('items.menu')
+            ->whereDate('created_at', today())
+            ->latest()
+            ->get();
+        return view('admin.orders.today', compact('orders'));
+    }
+
     public function edit(Order $order)
     {
         $order->load('items.menu');

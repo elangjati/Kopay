@@ -47,6 +47,11 @@
                               {{ request()->routeIs('admin.kasir*') ? 'bg-primary-700 text-white' : 'text-primary-200 hover:bg-primary-800 hover:text-white' }}">
                         + Pesanan Baru
                     </a>
+                    <a href="{{ route('admin.orders.today') }}"
+                       class="px-3 py-2 rounded text-sm font-medium transition
+                              {{ request()->routeIs('admin.orders.today') ? 'bg-primary-700 text-white' : 'text-primary-200 hover:bg-primary-800 hover:text-white' }}">
+                        Riwayat Hari Ini
+                    </a>
                     <a href="{{ route('admin.menus.index') }}"
                        class="px-3 py-2 rounded text-sm font-medium transition
                               {{ request()->routeIs('admin.menus*') ? 'bg-primary-700 text-white' : 'text-primary-200 hover:bg-primary-800 hover:text-white' }}">
@@ -89,6 +94,11 @@
                    class="block px-3 py-2.5 rounded text-sm font-medium transition
                           {{ request()->routeIs('admin.kasir*') ? 'bg-primary-700 text-white' : 'text-primary-200 hover:bg-primary-800 hover:text-white' }}">
                     + Pesanan Baru
+                </a>
+                <a href="{{ route('admin.orders.today') }}"
+                   class="block px-3 py-2.5 rounded text-sm font-medium transition
+                          {{ request()->routeIs('admin.orders.today') ? 'bg-primary-700 text-white' : 'text-primary-200 hover:bg-primary-800 hover:text-white' }}">
+                    Riwayat Hari Ini
                 </a>
                 <a href="{{ route('admin.menus.index') }}"
                    class="block px-3 py-2.5 rounded text-sm font-medium transition
