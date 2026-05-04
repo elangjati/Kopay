@@ -19,11 +19,7 @@
 
         {{-- Logo & Branding --}}
         <div class="text-center mb-8 animate-fade-in">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl mb-4 shadow-xl border border-white/20">
-                <svg class="w-10 h-10 text-amber-300" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M2,21V19H12V21H2M20,11V8H22V11H20M20,8V5H22V8H20M12,3A4,4 0 0,0 8,7H4C4,7 4,11 4,11C4,13.21 5.79,15 8,15H10V13H8C6.93,13 6.07,12.16 6,11.1L12,11.07V3H20V8H14V11H12V3H12M14,11H17C18.66,11 20,9.66 20,8H14V11Z"/>
-                </svg>
-            </div>
+            <img src="/images/logo.png" alt="Kopay" style="width:48px;height:48px;object-fit:cover;border-radius:8px;margin:0 auto 6px;">
             <h1 class="text-3xl font-bold text-white tracking-tight">Kopay</h1>
             <p class="text-amber-300/90 text-sm mt-1.5">Dashboard Admin</p>
         </div>
