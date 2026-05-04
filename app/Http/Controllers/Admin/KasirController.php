@@ -11,6 +11,23 @@ use Illuminate\Http\Request;
 
 class KasirController extends Controller
 {
+    public function index()
+    {
+        $orders = Order::with('items.menu')
+            ->latest()
+            ->limit(50)
+            ->get();
+
+        $todayOrders = Order::whereDate('created_at', today())->count();
+        $todayRevenue = Order::whereDate('created_at', today())
+            ->where('status', 'completed')
+            ->sum('total_price');
+        $pendingOrders = Order::where('status', 'pending')->count();
+        $totalMenus = \App\Models\Menu::where('is_available', true)->count();
+
+        return view('admin.dashboard', compact('orders', 'todayOrders', 'todayRevenue', 'pendingOrders', 'totalMenus'));
+    }
+
     public function create()
     {
         $menus           = Menu::where('is_available', true)->orderBy('category')->orderBy('name')->get();

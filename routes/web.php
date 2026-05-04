@@ -20,7 +20,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('auth')->group(function () {
 
         // Redirect dashboard lama ke kasir
-        Route::get('/dashboard', fn() => redirect()->route('admin.kasir.create'))->name('dashboard');
+        Route::get('/dashboard', [KasirController::class, 'index'])->name('dashboard');
 
         // Kasir
         Route::get('/kasir/create',                [KasirController::class, 'create'])->name('kasir.create');

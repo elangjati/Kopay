@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Rekap Penjualan - Kopay')
+
 @section('content')
 <div class="flex items-center justify-between mb-6">
     <div>
@@ -10,11 +12,11 @@
 
 {{-- Filter --}}
 <form method="GET" action="{{ route('admin.reports.index') }}"
-      class="bg-white rounded-xl border border-gray-200 p-4 mb-6 flex flex-wrap gap-3 items-end">
+      class="bg-white rounded-xl border border-gray-200 p-4 mb-6 flex flex-wrap gap-3 items-end shadow-sm">
     <div>
         <label class="block text-xs font-medium text-gray-700 mb-1.5">Tahun</label>
         <select name="year"
-                class="border border-gray-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white">
+                class="border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white">
             @foreach($years as $y)
                 <option value="{{ $y }}" {{ $y == $year ? 'selected' : '' }}>{{ $y }}</option>
             @endforeach
@@ -23,32 +25,53 @@
     <div>
         <label class="block text-xs font-medium text-gray-700 mb-1.5">Bulan</label>
         <select name="month"
-                class="border border-gray-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent bg-white">
+                class="border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white">
             @foreach($months as $num => $name)
                 <option value="{{ $num }}" {{ $num == $month ? 'selected' : '' }}>{{ $name }}</option>
             @endforeach
         </select>
     </div>
     <button type="submit"
-            class="bg-primary-800 hover:bg-primary-900 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition">
+            class="bg-primary-800 hover:bg-primary-900 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition shadow-sm">
         Tampilkan
     </button>
 </form>
 
 {{-- Summary Cards --}}
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-    <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Total Pesanan Selesai</p>
+    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Pesanan Selesai</p>
+            <div class="w-8 h-8 bg-primary-50 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                </svg>
+            </div>
+        </div>
         <p class="text-3xl font-bold text-gray-900">{{ $summary->total_orders ?? 0 }}</p>
         <p class="text-xs text-gray-400 mt-1">{{ $months[$month] }} {{ $year }}</p>
     </div>
-    <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Total Pendapatan</p>
-        <p class="text-3xl font-bold text-primary-700">Rp {{ number_format($summary->total_revenue ?? 0, 0, ',', '.') }}</p>
+    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Pendapatan</p>
+            <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+        </div>
+        <p class="text-3xl font-bold text-green-600">Rp {{ number_format($summary->total_revenue ?? 0, 0, ',', '.') }}</p>
         <p class="text-xs text-gray-400 mt-1">{{ $months[$month] }} {{ $year }}</p>
     </div>
-    <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Rata-rata per Pesanan</p>
+    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Rata-rata / Pesanan</p>
+            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+            </div>
+        </div>
         <p class="text-3xl font-bold text-gray-900">
             Rp {{ ($summary->total_orders ?? 0) > 0 ? number_format($summary->total_revenue / $summary->total_orders, 0, ',', '.') : 0 }}
         </p>
@@ -59,13 +82,18 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
 
     {{-- Top Items --}}
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 class="text-sm font-semibold text-gray-700 mb-4">Menu Terlaris — {{ $months[$month] }} {{ $year }}</h3>
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <h3 class="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+            <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            Menu Terlaris — {{ $months[$month] }} {{ $year }}
+        </h3>
         @forelse($topItems as $i => $item)
-        <div class="flex items-center justify-between py-2.5 {{ $i < $topItems->count() - 1 ? 'border-b border-gray-100' : '' }}">
+        <div class="flex items-center justify-between py-3 {{ $i < $topItems->count() - 1 ? 'border-b border-gray-100' : '' }}">
             <div class="flex items-center gap-3">
-                <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center
-                    {{ $i === 0 ? 'bg-primary-800 text-white' : 'bg-gray-100 text-gray-600' }}">
+                <span class="w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center
+                    {{ $i === 0 ? 'bg-primary-800 text-white' : ($i === 1 ? 'bg-gray-200 text-gray-700' : ($i === 2 ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-600')) }}">
                     {{ $i + 1 }}
                 </span>
                 <span class="text-sm text-gray-700">{{ $item->menu->name ?? 'Menu dihapus' }}</span>
@@ -76,27 +104,32 @@
             </div>
         </div>
         @empty
-            <p class="text-gray-400 text-sm text-center py-8">Belum ada data penjualan.</p>
+            <div class="text-center py-10">
+                <svg class="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <p class="text-sm text-gray-400">Belum ada data penjualan</p>
+            </div>
         @endforelse
     </div>
 
     {{-- Monthly Breakdown --}}
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
         <h3 class="text-sm font-semibold text-gray-700 mb-4">Rekap Per Bulan — {{ $year }}</h3>
         <div class="space-y-2.5">
             @foreach($months as $num => $name)
             @php $data = $monthly->get($num); @endphp
             <div class="flex items-center gap-3">
-                <span class="text-xs text-gray-500 w-20 shrink-0">{{ $name }}</span>
-                <div class="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                <span class="text-xs text-gray-500 w-16 shrink-0 font-medium">{{ substr($name, 0, 3) }}</span>
+                <div class="flex-1 bg-gray-100 rounded-full h-5 overflow-hidden">
                     @php
                         $maxRevenue = $monthly->max('total_revenue') ?: 1;
                         $width = $data ? round(($data->total_revenue / $maxRevenue) * 100) : 0;
                     @endphp
-                    <div class="h-4 rounded-full transition-all {{ $num == $month ? 'bg-primary-700' : 'bg-primary-300' }}"
-                         style="width: {{ $width }}%"></div>
+                    <div class="h-5 rounded-full transition-all duration-500 {{ $num == $month ? 'bg-primary-600' : 'bg-primary-300' }}"
+                         style="width: {{ max($width, $data ? 8 : 0) }}%"></div>
                 </div>
-                <span class="text-xs text-gray-600 w-28 text-right shrink-0">
+                <span class="text-xs text-gray-600 w-24 text-right shrink-0 font-medium">
                     {{ $data ? 'Rp ' . number_format($data->total_revenue, 0, ',', '.') : '—' }}
                 </span>
             </div>
@@ -106,7 +139,7 @@
 </div>
 
 {{-- Orders Table --}}
-<div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+<div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
     <div class="px-5 py-4 border-b border-gray-100">
         <h3 class="text-sm font-semibold text-gray-700">Detail Pesanan Selesai — {{ $months[$month] }} {{ $year }}</h3>
     </div>
@@ -118,7 +151,7 @@
             ->latest()->get();
     @endphp
 
-    {{-- Desktop: tabel --}}
+    {{-- Desktop: table --}}
     <div class="hidden md:block">
         <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b border-gray-200">
@@ -132,10 +165,10 @@
             </thead>
             <tbody class="divide-y divide-gray-100">
                 @forelse($completedOrders as $order)
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-5 py-3.5 text-gray-400 text-xs">{{ $order->id }}</td>
+                <tr class="hover:bg-gray-50/80 transition">
+                    <td class="px-5 py-3.5 text-gray-400 text-xs font-mono">#{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</td>
                     <td class="px-5 py-3.5 font-medium text-gray-900">{{ $order->customer_name }}</td>
-                    <td class="px-5 py-3.5 text-gray-500 text-xs">
+                    <td class="px-5 py-3.5 text-gray-500 text-xs max-w-[200px] truncate">
                         {{ $order->items->map(fn($i) => ($i->menu->name ?? '?') . ' x' . $i->quantity)->join(', ') }}
                     </td>
                     <td class="px-5 py-3.5 font-semibold text-primary-700">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
@@ -143,7 +176,14 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="text-center text-gray-400 py-10 text-sm">Belum ada pesanan selesai bulan ini.</td>
+                    <td colspan="5" class="text-center py-12">
+                        <div class="text-gray-400">
+                            <svg class="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                            <p class="text-sm">Belum ada pesanan selesai bulan ini</p>
+                        </div>
+                    </td>
                 </tr>
                 @endforelse
             </tbody>
@@ -156,18 +196,18 @@
         <div class="p-4">
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2">
-                    <span class="text-xs text-gray-400">#{{ $order->id }}</span>
+                    <span class="text-xs text-gray-400 font-mono">#{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</span>
                     <span class="font-semibold text-gray-900 text-sm">{{ $order->customer_name }}</span>
                 </div>
                 <span class="font-bold text-primary-700 text-sm">Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
             </div>
-            <p class="text-xs text-gray-500 mb-1.5">
+            <p class="text-xs text-gray-500 mb-1.5 truncate">
                 {{ $order->items->map(fn($i) => ($i->menu->name ?? '?') . ' x' . $i->quantity)->join(', ') }}
             </p>
             <p class="text-xs text-gray-400">{{ $order->created_at->format('d M Y, H:i') }}</p>
         </div>
         @empty
-        <div class="text-center text-gray-400 py-10 text-sm">Belum ada pesanan selesai bulan ini.</div>
+        <div class="text-center text-gray-400 py-12 text-sm">Belum ada pesanan selesai bulan ini.</div>
         @endforelse
     </div>
 </div>
