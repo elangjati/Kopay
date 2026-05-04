@@ -8,8 +8,8 @@ use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\KasirController;
 
-// Redirect root ke kasir
-Route::get('/', fn() => redirect()->route('admin.kasir.create'));
+// Landing page — publik
+Route::get('/', fn() => view('landing'))->name('landing');
 
 // Midtrans webhook — tidak perlu auth
 Route::post('/webhook/midtrans', [WebhookController::class, 'midtrans'])->name('webhook.midtrans');
@@ -24,7 +24,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('auth')->group(function () {
 
         // Redirect dashboard lama ke kasir
-        Route::get('/dashboard', fn() => redirect()->route('admin.kasir.create'))->name('dashboard');
+        Route::get('/dashboard', [KasirController::class, 'index'])->name('dashboard');
 
         // Kasir
         Route::get('/kasir/create',                [KasirController::class, 'create'])->name('kasir.create');

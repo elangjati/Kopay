@@ -3,128 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Struk #{{ $order->id }}</title>
+    <title>Struk #{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            background: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .receipt {
-            background: white;
-            width: 300px;
-            padding: 20px 16px;
-        }
-
-        .header { text-align: center; margin-bottom: 12px; }
-        .header h1 { font-size: 16px; font-weight: bold; letter-spacing: 1px; }
-        .header p { font-size: 11px; color: #555; margin-top: 2px; }
-
-        .divider { border-top: 1px dashed #999; margin: 10px 0; }
-        .divider-solid { border-top: 1px solid #333; margin: 10px 0; }
-
-        .info { margin-bottom: 4px; display: flex; justify-content: space-between; }
-        .info span:first-child { color: #555; }
-
-        .items { margin: 8px 0; }
-        .item { margin-bottom: 6px; }
-        .item-name { font-weight: bold; }
-        .item-detail { display: flex; justify-content: space-between; color: #444; padding-left: 8px; }
-
-        .total-row { display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; }
-
-        .footer { text-align: center; margin-top: 12px; font-size: 11px; color: #666; }
-
-        .status-badge {
-            display: inline-block;
-            background: #166534;
-            color: white;
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-top: 4px;
-        }
-
-        .print-btn {
-            display: block;
-            width: 300px;
-            margin: 16px auto 0;
-            padding: 10px;
-            background: #166534;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .back-btn {
-            display: block;
-            width: 300px;
-            margin: 8px auto 0;
-            padding: 8px;
-            background: white;
-            color: #555;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-        }
-
         @media print {
-            body { background: white; padding: 0; }
-            .receipt { width: 100%; padding: 0; }
-            .print-btn, .back-btn { display: none; }
+            body { background: white !important; padding: 0 !important; }
+            .no-print { display: none !important; }
+            .receipt-wrapper { box-shadow: none !important; border: none !important; }
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen flex items-start justify-center py-8">
 
-<div>
-    <div class="receipt">
-        <div class="header">
+<div class="w-full max-w-sm px-4 no-print mb-4">
+    <a href="{{ route('admin.kasir.create') }}"
+       class="flex items-center justify-center gap-2 w-full bg-primary-800 hover:bg-primary-900 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Pesanan Baru
+    </a>
+    <button onclick="window.print()"
+            class="flex items-center justify-center gap-2 w-full mt-2 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-xl transition text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+        </svg>
+        Cetak Struk
+    </button>
+</div>
+
+<div class="receipt-wrapper bg-white w-[300px] shadow-lg overflow-hidden">
+    <div class="p-5 font-mono text-xs">
+
+        {{-- Header --}}
+        <div class="text-center mb-4 pb-4 border-b-2 border-dashed border-gray-300">
             <img src="/images/logo.png" alt="Kopay" style="width:48px;height:48px;object-fit:cover;border-radius:8px;margin:0 auto 6px;">
-            <h1>KOPAY</h1>
-            <p>Terima kasih atas kunjungan Anda</p>
-            <span class="status-badge">PEMBAYARAN BERHASIL</span>
+            <h1 class="text-base font-bold tracking-wider text-gray-900">KOPAY</h1>
+            <p class="text-[10px] text-gray-500 mt-0.5">Terima kasih atas kunjungan Anda</p>
+            <span class="inline-block bg-green-100 text-green-800 text-[10px] font-semibold px-2 py-0.5 rounded-full mt-2">PEMBAYARAN BERHASIL</span>
         </div>
 
-        <div class="divider-solid"></div>
+        {{-- Order info --}}
+        <div class="space-y-1.5 mb-4 pb-3 border-b border-dashed border-gray-300">
+            <div class="flex justify-between">
+                <span class="text-gray-500">No. Struk</span>
+                <span class="font-semibold">#{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-500">Tanggal</span>
+                <span>{{ $order->created_at->format('d/m/Y H:i') }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-500">Pelanggan</span>
+                <span>{{ $order->customer_name }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-500">Pembayaran</span>
+                <span class="uppercase">{{ $order->payment_method === 'qris' ? 'QRIS' : 'Tunai' }}</span>
+            </div>
+        </div>
 
-        <div class="info">
-            <span>No. Struk</span>
-            <span>#{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</span>
-        </div>
-        <div class="info">
-            <span>Tanggal</span>
-            <span>{{ $order->created_at->format('d/m/Y H:i') }}</span>
-        </div>
-        <div class="info">
-            <span>Pelanggan</span>
-            <span>{{ $order->customer_name }}</span>
-        </div>
-        <div class="info">
-            <span>Pembayaran</span>
-            <span>{{ $order->payment_method === 'qris' ? 'QRIS' : 'Tunai' }}</span>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="items">
+        {{-- Items --}}
+        <div class="space-y-2 mb-4 pb-3 border-b border-dashed border-gray-300">
             @foreach($order->items as $item)
-            <div class="item">
-                <div class="item-name">{{ $item->menu->name ?? 'Menu dihapus' }}</div>
-                <div class="item-detail">
+            <div>
+                <div class="font-semibold">{{ $item->menu->name ?? 'Menu dihapus' }}</div>
+                <div class="flex justify-between text-gray-500 pl-2">
                     <span>{{ $item->quantity }} x Rp {{ number_format($item->price, 0, ',', '.') }}</span>
                     <span>Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</span>
                 </div>
@@ -132,37 +76,32 @@
             @endforeach
         </div>
 
-        <div class="divider-solid"></div>
-
-        <div class="total-row">
+        {{-- Total --}}
+        <div class="flex justify-between font-bold text-sm mb-3">
             <span>TOTAL</span>
             <span>Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
         </div>
 
         @if($order->notes)
-        <div class="divider"></div>
-        <div style="font-size:11px; color:#555;">
-            <span>Catatan: {{ $order->notes }}</span>
+        <div class="mb-3 pb-3 border-b border-dashed border-gray-300">
+            <span class="text-gray-500">Catatan: {{ $order->notes }}</span>
         </div>
         @endif
 
-        <div class="divider"></div>
-
-        <div class="footer">
+        {{-- Footer --}}
+        <div class="text-center text-[10px] text-gray-500 pt-2">
             <p>Pesanan telah dibayar</p>
-            <p style="margin-top:6px;">— Sampai jumpa lagi! —</p>
+            <p class="mt-1">— Sampai jumpa lagi! —</p>
         </div>
     </div>
-
-    <button class="print-btn" onclick="window.print()">Cetak Struk</button>
-    <a href="{{ route('admin.kasir.create') }}" class="back-btn">+ Pesanan Baru</a>
 </div>
 
 <script>
-    // Auto print when page loads
-    window.onload = function() {
-        window.print();
-    }
+    @if(!request()->has('noauto'))
+    window.addEventListener('load', function() {
+        setTimeout(() => window.print(), 500);
+    });
+    @endif
 </script>
 </body>
 </html>

@@ -1,17 +1,18 @@
 @extends('layouts.admin')
 
+@section('title', 'Pembayaran QRIS - Kopay')
+
 @section('content')
 <div class="max-w-lg mx-auto" x-data="qrisPage()">
 
     <div class="flex items-center gap-3 mb-6">
-        <a href="{{ route('admin.dashboard') }}"
-           class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1 transition">
+        <a href="{{ route('admin.kasir.create') }}"
+           class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1.5 transition bg-white px-3 py-2 rounded-lg border border-gray-200 hover:border-gray-300 shadow-sm">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
-            Dashboard
+            Kembali
         </a>
-        <span class="text-gray-300">/</span>
         <h2 class="text-xl font-bold text-gray-900">Pembayaran QRIS</h2>
     </div>
 
@@ -62,7 +63,7 @@
             </div>
 
             {{-- Status indicator --}}
-            <div class="flex items-center justify-center gap-2 mb-5" x-show="!paid">
+            <div class="flex items-center justify-center gap-2 mb-5" x-show="!paid" x-cloak>
                 <span class="relative flex h-2.5 w-2.5">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-500"></span>
@@ -70,18 +71,7 @@
                 <span class="text-sm text-gray-500">Menunggu pembayaran...</span>
             </div>
 
-            {{-- Expire countdown --}}
-            <div x-show="!paid" class="text-center mb-3">
-                <p class="text-xs text-gray-400">
-                    QR berlaku selama <span class="font-semibold text-gray-600" x-text="countdown"></span>
-                </p>
-            </div>
-            <div x-show="expired && !paid" class="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg mb-4 text-center">
-                QR sudah expire.
-                <a href="{{ route('admin.kasir.create') }}" class="font-semibold underline">Buat pesanan baru</a>
-            </div>
-
-            <div x-show="paid" class="flex items-center justify-center gap-2 mb-5 text-green-600">
+            <div x-show="paid" x-cloak class="flex items-center justify-center gap-2 mb-5 text-green-600">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                 </svg>
@@ -90,18 +80,17 @@
 
             {{-- Actions --}}
             <div class="grid grid-cols-2 gap-3">
-                {{-- Konfirmasi manual --}}
                 <form action="{{ route('admin.orders.complete', $order) }}" method="POST">
                     @csrf
                     <button type="submit"
                             onclick="return confirm('Konfirmasi pesanan #{{ $order->id }} sudah dibayar?')"
-                            class="w-full bg-primary-800 hover:bg-primary-900 text-white text-sm font-semibold py-2.5 rounded-lg transition">
-                        ✓ Konfirmasi Bayar
+                            class="w-full bg-primary-800 hover:bg-primary-900 text-white text-sm font-semibold py-2.5 rounded-xl transition shadow-sm">
+                        Konfirmasi Bayar
                     </button>
                 </form>
 
                 <a href="{{ route('admin.kasir.create') }}"
-                   class="w-full border border-gray-300 hover:bg-gray-50 text-gray-600 text-sm font-medium py-2.5 rounded-lg transition text-center">
+                   class="w-full border border-gray-300 hover:bg-gray-50 text-gray-600 text-sm font-medium py-2.5 rounded-xl transition text-center">
                     Pesanan Baru
                 </a>
             </div>
@@ -115,26 +104,12 @@
     </div>
 </div>
 
+@push('scripts')
 <script>
 function qrisPage() {
     return {
         paid: false,
-        expired: false,
-        countdown: '15:00',
         init() {
-            // Countdown 15 menit
-            let seconds = 15 * 60;
-            const timer = setInterval(() => {
-                seconds--;
-                const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-                const s = (seconds % 60).toString().padStart(2, '0');
-                this.countdown = `${m}:${s}`;
-                if (seconds <= 0) {
-                    clearInterval(timer);
-                    this.expired = true;
-                }
-            }, 1000);
-
             @if($order->qris_url && $order->status !== 'completed')
             this.poll();
             @endif
@@ -157,4 +132,5 @@ function qrisPage() {
     }
 }
 </script>
+@endpush
 @endsection
