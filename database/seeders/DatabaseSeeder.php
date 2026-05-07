@@ -12,15 +12,15 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Owner
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'owner@kopay.com'],
-            ['name' => 'Owner', 'password' => Hash::make('password'), 'role' => 'owner']
+            ['name' => 'Owner', 'password' => Hash::make('Kopay@Owner2026'), 'role' => 'owner']
         );
 
         // Kasir
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'kasir@kopay.com'],
-            ['name' => 'Kasir', 'password' => Hash::make('password'), 'role' => 'kasir']
+            ['name' => 'Kasir', 'password' => Hash::make('Kopay@Kasir2026'), 'role' => 'kasir']
         );
 
         $menus = [
