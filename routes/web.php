@@ -11,6 +11,12 @@ use App\Http\Controllers\Admin\KasirController;
 // Landing page — publik
 Route::get('/', fn() => view('landing'))->name('landing');
 
+// Menu digital — publik
+Route::get('/menu', fn() => view('menu'))->name('menu');
+
+// Menu digital — publik
+Route::get('/menu', fn() => view('menu'))->name('menu');
+
 // Midtrans webhook — tidak perlu auth
 Route::post('/webhook/midtrans', [WebhookController::class, 'midtrans'])->name('webhook.midtrans');
 
