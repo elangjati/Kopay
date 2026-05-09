@@ -237,13 +237,18 @@
                         <div id="order-items-input"></div>
 
                         <button type="submit"
-                                :disabled="cart.length === 0"
+                                :disabled="cart.length === 0 || submitting"
+                                @click="submitting = true"
                                 class="w-full text-white font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm hover:shadow disabled:shadow-none"
                                 style="background:#1a3a1a">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg x-show="!submitting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
-                            {{ $isCreate ? 'Buat Pesanan' : 'Simpan Perubahan' }}
+                            <svg x-show="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                            </svg>
+                            <span x-text="submitting ? 'Memproses...' : '{{ $isCreate ? 'Buat Pesanan' : 'Simpan Perubahan' }}'"></span>
                         </button>
                     </div>
                 </form>
@@ -260,6 +265,7 @@ function orderForm(initialItems, menus) {
         search: '',
         tab: 'menu',
         isDesktop: window.innerWidth >= 1024,
+        submitting: false,
         init() {
             const update = () => { this.isDesktop = window.innerWidth >= 1024; };
             window.addEventListener('resize', update);

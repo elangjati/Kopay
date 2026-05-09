@@ -84,18 +84,28 @@
                 </td>
                 <td class="px-5 py-3.5 text-gray-400 text-xs">{{ $order->created_at->format('H:i') }}</td>
                 <td class="px-5 py-3.5">
-                    @if($order->status === 'completed')
-                        <a href="{{ route('admin.orders.receipt', $order) }}"
-                           class="inline-flex items-center gap-1 text-xs font-medium text-primary-700 hover:text-primary-900 transition">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M17 17H17.01M17 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/>
-                            </svg>
-                            Cetak Struk
-                        </a>
-                    @else
-                        <span class="text-xs text-gray-300">—</span>
-                    @endif
+                    <div class="flex items-center gap-2">
+                        @if($order->status === 'completed')
+                            <a href="{{ route('admin.orders.receipt', $order) }}"
+                               class="text-xs font-medium text-primary-700 hover:text-primary-900 transition">
+                                Cetak Struk
+                            </a>
+                        @elseif($order->status === 'pending')
+                            <a href="{{ route('admin.orders.edit', $order) }}"
+                               class="text-xs font-medium text-gray-600 hover:text-gray-900 transition">
+                                Edit
+                            </a>
+                            <form action="{{ route('admin.orders.destroy', $order) }}" method="POST"
+                                  onsubmit="return confirm('Batalkan pesanan #{{ $order->id }}?')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="text-xs font-medium text-red-500 hover:text-red-700 transition">
+                                    Batalkan
+                                </button>
+                            </form>
+                        @else
+                            <span class="text-xs text-gray-300">—</span>
+                        @endif
+                    </div>
                 </td>
             </tr>
             @endforeach
@@ -146,6 +156,18 @@
                     </svg>
                     Cetak Struk
                 </a>
+            @elseif($order->status === 'pending')
+                <div class="flex gap-3">
+                    <a href="{{ route('admin.orders.edit', $order) }}"
+                       class="text-xs font-medium text-gray-600 hover:text-gray-900 transition">Edit</a>
+                    <form action="{{ route('admin.orders.destroy', $order) }}" method="POST"
+                          onsubmit="return confirm('Batalkan pesanan #{{ $order->id }}?')">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="text-xs font-medium text-red-500 hover:text-red-700 transition">
+                            Batalkan
+                        </button>
+                    </form>
+                </div>
             @endif
         </div>
     </div>
