@@ -238,7 +238,6 @@
 
                         <button type="submit"
                                 :disabled="cart.length === 0 || submitting"
-                                @click="submitting = true"
                                 class="w-full text-white font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm hover:shadow disabled:shadow-none"
                                 style="background:#1a3a1a">
                             <svg x-show="!submitting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,6 +288,7 @@ function orderForm(initialItems, menus) {
         fmt(val) { return val.toLocaleString('id-ID'); },
         submitForm() {
             if (this.cart.length === 0) return;
+            this.submitting = true;
             const container = document.getElementById('order-items-input');
             container.innerHTML = '';
             this.cart.forEach((item, index) => {
