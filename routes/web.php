@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\WebhookController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\OrderController;
@@ -8,17 +7,18 @@ use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\KasirController;
 
-// Landing page — publik
-Route::get('/', fn() => view('landing'))->name('landing');
+// Landing page + menu publik
+Route::get('/', function () {
+    $menus = \App\Models\Menu::where('is_available', true)
+        ->orderBy('category')
+        ->orderBy('name')
+        ->get()
+        ->groupBy('category');
+    return view('landing', compact('menus'));
+})->name('landing');
 
-// Menu digital — publik
-Route::get('/menu', fn() => view('menu'))->name('menu');
-
-// Menu digital — publik
-Route::get('/menu', fn() => view('menu'))->name('menu');
-
-// Midtrans webhook — tidak perlu auth
-Route::post('/webhook/midtrans', [WebhookController::class, 'midtrans'])->name('webhook.midtrans');
+// /menu redirect ke landing
+Route::get('/menu', fn() => redirect()->route('landing'))->name('menu');
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
@@ -29,14 +29,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::middleware('auth')->group(function () {
 
-        // Redirect dashboard lama ke kasir
+        // Dashboard
         Route::get('/dashboard', [KasirController::class, 'index'])->name('dashboard');
 
         // Kasir
-        Route::get('/kasir/create',                [KasirController::class, 'create'])->name('kasir.create');
-        Route::post('/kasir',                      [KasirController::class, 'store'])->name('kasir.store');
-        Route::get('/kasir/{order}/qris',          [KasirController::class, 'qris'])->name('kasir.qris');
-        Route::get('/kasir/{order}/check-payment', [KasirController::class, 'checkPayment'])->name('kasir.checkPayment');
+        Route::get('/kasir/create', [KasirController::class, 'create'])->name('kasir.create');
+        Route::post('/kasir',       [KasirController::class, 'store'])->name('kasir.store');
 
         // Orders
         Route::get('/orders/today',            [OrderController::class, 'today'])->name('orders.today');

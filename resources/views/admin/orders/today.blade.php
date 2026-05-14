@@ -63,7 +63,7 @@
                 <td class="px-5 py-3.5 text-gray-400 text-xs">{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</td>
                 <td class="px-5 py-3.5 font-medium text-gray-900">{{ $order->customer_name }}</td>
                 <td class="px-5 py-3.5 text-gray-500 text-xs max-w-xs">
-                    {{ $order->items->map(fn($i) => ($i->menu->name ?? '?') . ' x' . $i->quantity)->join(', ') }}
+                    {{ $order->items->map(fn($i) => ($i->menu->name ?? 'Menu dihapus') . ' x' . $i->quantity)->join(', ') }}
                 </td>
                 <td class="px-5 py-3.5 font-semibold text-primary-700">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
                 <td class="px-5 py-3.5">
@@ -95,11 +95,26 @@
                                class="text-xs font-medium text-gray-600 hover:text-gray-900 transition">
                                 Edit
                             </a>
+                            <form action="{{ route('admin.orders.complete', $order) }}" method="POST"
+                                  class="flex items-center gap-1">
+                                @csrf
+                                <select name="payment_method"
+                                        class="text-xs border border-gray-300 rounded-lg px-2 py-1 focus:outline-none bg-white">
+                                    <option value="tunai" {{ $order->payment_method === 'tunai' ? 'selected' : '' }}>Tunai</option>
+                                    <option value="qris" {{ $order->payment_method === 'qris' ? 'selected' : '' }}>QRIS</option>
+                                </select>
+                                <button type="submit"
+                                        onclick="return confirm('Konfirmasi pesanan #{{ $order->id }} sudah dibayar?')"
+                                        class="text-xs font-semibold text-white px-2.5 py-1 rounded-lg"
+                                        style="background:#1a3a1a">
+                                    Konfirmasi
+                                </button>
+                            </form>
                             <form action="{{ route('admin.orders.destroy', $order) }}" method="POST"
                                   onsubmit="return confirm('Batalkan pesanan #{{ $order->id }}?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="text-xs font-medium text-red-500 hover:text-red-700 transition">
-                                    Batalkan
+                                    Batal
                                 </button>
                             </form>
                         @else
@@ -132,7 +147,7 @@
                     <span class="font-semibold text-gray-900 text-sm">{{ $order->customer_name }}</span>
                 </div>
                 <p class="text-xs text-gray-500">
-                    {{ $order->items->map(fn($i) => ($i->menu->name ?? '?') . ' x' . $i->quantity)->join(', ') }}
+                    {{ $order->items->map(fn($i) => ($i->menu->name ?? 'Menu dihapus') . ' x' . $i->quantity)->join(', ') }}
                 </p>
             </div>
             <span class="font-bold text-primary-700 text-sm ml-3 shrink-0">Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
@@ -157,14 +172,31 @@
                     Cetak Struk
                 </a>
             @elseif($order->status === 'pending')
-                <div class="flex gap-3">
-                    <a href="{{ route('admin.orders.edit', $order) }}"
-                       class="text-xs font-medium text-gray-600 hover:text-gray-900 transition">Edit</a>
-                    <form action="{{ route('admin.orders.destroy', $order) }}" method="POST"
-                          onsubmit="return confirm('Batalkan pesanan #{{ $order->id }}?')">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="text-xs font-medium text-red-500 hover:text-red-700 transition">
-                            Batalkan
+                <div class="flex flex-col gap-2 items-end">
+                    <div class="flex gap-2">
+                        <a href="{{ route('admin.orders.edit', $order) }}"
+                           class="text-xs font-medium text-gray-600 hover:text-gray-900 transition">Edit</a>
+                        <form action="{{ route('admin.orders.destroy', $order) }}" method="POST"
+                              onsubmit="return confirm('Batalkan pesanan #{{ $order->id }}?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-xs font-medium text-red-500 hover:text-red-700 transition">
+                                Batal
+                            </button>
+                        </form>
+                    </div>
+                    <form action="{{ route('admin.orders.complete', $order) }}" method="POST"
+                          class="flex items-center gap-1">
+                        @csrf
+                        <select name="payment_method"
+                                class="text-xs border border-gray-300 rounded-lg px-2 py-1 focus:outline-none bg-white">
+                            <option value="tunai" {{ $order->payment_method === 'tunai' ? 'selected' : '' }}>Tunai</option>
+                            <option value="qris" {{ $order->payment_method === 'qris' ? 'selected' : '' }}>QRIS</option>
+                        </select>
+                        <button type="submit"
+                                onclick="return confirm('Konfirmasi pesanan #{{ $order->id }} sudah dibayar?')"
+                                class="text-xs font-semibold text-white px-2.5 py-1 rounded-lg"
+                                style="background:#1a3a1a">
+                            Konfirmasi
                         </button>
                     </form>
                 </div>
