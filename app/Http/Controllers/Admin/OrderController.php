@@ -10,6 +10,15 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    public function today()
+    {
+        $orders = Order::with('items.menu')
+            ->whereDate('created_at', today())
+            ->latest()
+            ->get();
+        return view('admin.orders.today', compact('orders'));
+    }
+
     public function edit(Order $order)
     {
         $order->load('items.menu');
@@ -61,13 +70,20 @@ class OrderController extends Controller
         return view('admin.orders.receipt', compact('order'));
     }
 
-    public function complete(Order $order)
+    public function complete(Request $request, Order $order)
     {
         if ($order->status === 'completed') {
             return redirect()->route('admin.orders.receipt', $order->id);
         }
 
-        $order->update(['status' => 'completed']);
+        $data = ['status' => 'completed'];
+
+        // Update metode bayar jika dikirim dari form konfirmasi
+        if ($request->filled('payment_method')) {
+            $data['payment_method'] = $request->payment_method;
+        }
+
+        $order->update($data);
 
         try {
             $sheets = new GoogleSheetsService();

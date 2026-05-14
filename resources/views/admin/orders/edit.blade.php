@@ -130,14 +130,14 @@
                     Ringkasan Pesanan
                 </h3>
 
-                <div x-show="cart.length === 0" x-cloak class="text-center py-8 text-gray-400">
+                <div x-show="cart.length === 0" class="text-center py-8 text-gray-400">
                     <svg class="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
                     <p class="text-xs">Pilih menu untuk memulai</p>
                 </div>
 
-                <div x-show="cart.length > 0" x-cloak>
+                <div x-show="cart.length > 0">
                     <ul class="space-y-1.5 mb-3 max-h-56 overflow-y-auto pr-1">
                         <template x-for="(item, index) in cart" :key="item.id">
                             <li class="flex items-center gap-2 py-2 border-b border-gray-100 last:border-0">
@@ -199,7 +199,7 @@
 
                         @if($isCreate)
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1.5">Metode Pembayaran <span class="text-red-500">*</span></label>
+                            <label class="block text-xs font-medium text-gray-700 mb-1.5">Metode Pembayaran</label>
                             <div class="grid grid-cols-2 gap-2">
                                 <label class="relative cursor-pointer">
                                     <input type="radio" name="payment_method" value="tunai"
@@ -222,6 +222,7 @@
                                     </div>
                                 </label>
                             </div>
+                            <p class="text-[10px] text-gray-400 mt-1.5">Pilih metode hanya jika bayar sekarang. Bayar nanti bisa dikonfirmasi di riwayat.</p>
                         </div>
                         @else
                         @if($order->payment_method)
@@ -236,15 +237,32 @@
 
                         <div id="order-items-input"></div>
 
+                        @if($isCreate)
+                        {{-- Dua tombol: Bayar Sekarang & Bayar Nanti --}}
+                        <input type="hidden" name="pay_now" x-bind:value="payNow ? '1' : '0'">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="submit"
+                                    :disabled="cart.length === 0 || submitting"
+                                    @click="payNow = false"
+                                    class="w-full border-2 border-primary-800 text-primary-800 font-semibold py-2.5 rounded-xl transition text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary-50">
+                                Bayar Nanti
+                            </button>
+                            <button type="submit"
+                                    :disabled="cart.length === 0 || submitting"
+                                    @click="payNow = true"
+                                    class="w-full text-white font-semibold py-2.5 rounded-xl transition text-sm disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+                                    style="background:#1a3a1a">
+                                <span x-text="submitting ? 'Memproses...' : 'Bayar Sekarang'">Bayar Sekarang</span>
+                            </button>
+                        </div>
+                        @else
                         <button type="submit"
-                                :disabled="cart.length === 0"
-                                class="w-full text-white font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm hover:shadow disabled:shadow-none"
+                                :disabled="cart.length === 0 || submitting"
+                                class="w-full text-white font-semibold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
                                 style="background:#1a3a1a">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            {{ $isCreate ? 'Buat Pesanan' : 'Simpan Perubahan' }}
+                            <span x-text="submitting ? 'Memproses...' : 'Simpan Perubahan'"></span>
                         </button>
+                        @endif
                     </div>
                 </form>
             </div>
@@ -260,6 +278,8 @@ function orderForm(initialItems, menus) {
         search: '',
         tab: 'menu',
         isDesktop: window.innerWidth >= 1024,
+        submitting: false,
+        payNow: true,
         init() {
             const update = () => { this.isDesktop = window.innerWidth >= 1024; };
             window.addEventListener('resize', update);
@@ -283,6 +303,17 @@ function orderForm(initialItems, menus) {
         fmt(val) { return val.toLocaleString('id-ID'); },
         submitForm() {
             if (this.cart.length === 0) return;
+
+            // Kalau bayar sekarang, pastikan metode pembayaran dipilih
+            if (this.payNow) {
+                const method = document.querySelector('input[name="payment_method"]:checked');
+                if (!method) {
+                    alert('Pilih metode pembayaran terlebih dahulu.');
+                    return;
+                }
+            }
+
+            this.submitting = true;
             const container = document.getElementById('order-items-input');
             container.innerHTML = '';
             this.cart.forEach((item, index) => {

@@ -4,14 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin - Kopay')</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50:  '#fdf8f3',
+                            100: '#f5e6d3',
+                            200: '#e8c9a0',
+                            300: '#d4a06a',
+                            400: '#c07840',
+                            500: '#8B4513',
+                            600: '#7a3c10',
+                            700: '#6b340e',
+                            800: '#1a3a1a',
+                            900: '#122812',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>[x-cloak]{display:none!important}</style>
 </head>
 <body class="bg-gray-50 min-h-screen">
 
     {{-- Toast Container --}}
     <div id="toast-container" class="toast-container"></div>
 
-    <nav class="bg-primary-800 text-white shadow-lg">
+    <nav class="bg-primary-800 text-white shadow-lg" x-data="{ mobileMenu: false }">
         <div class="max-w-7xl mx-auto px-4 py-3">
             <div class="flex items-center justify-between">
                 {{-- Logo --}}
@@ -37,6 +60,11 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
                         Pesanan
+                    </a>
+                    <a href="{{ route('admin.orders.today') }}"
+                       class="px-3 py-2 rounded text-sm font-medium transition
+                              {{ request()->routeIs('admin.orders.today') ? 'bg-primary-700 text-white' : 'text-primary-200 hover:bg-primary-800 hover:text-white' }}">
+                        Riwayat Hari Ini
                     </a>
                     <a href="{{ route('admin.menus.index') }}"
                        class="px-3 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1.5
@@ -105,6 +133,11 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Pesanan
+                </a>
+                <a href="{{ route('admin.orders.today') }}"
+                   class="block px-3 py-2.5 rounded text-sm font-medium transition
+                          {{ request()->routeIs('admin.orders.today') ? 'bg-primary-700 text-white' : 'text-primary-200 hover:bg-primary-800 hover:text-white' }}">
+                    Riwayat Hari Ini
                 </a>
                 <a href="{{ route('admin.menus.index') }}"
                    class="block px-3 py-2.5 rounded-lg text-sm font-medium transition flex items-center gap-2
@@ -195,6 +228,7 @@
             }, 4000);
         }
     </script>
+    <script src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
     @stack('scripts')
 </body>
 </html>

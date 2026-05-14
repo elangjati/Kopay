@@ -7,9 +7,13 @@ use Illuminate\Http\Request;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, string $role): mixed
+    public function handle(Request $request, Closure $next, string ...$roles): mixed
     {
-        if (!auth()->check() || auth()->user()->role !== $role) {
+        if (!auth()->check()) {
+            return redirect()->route('admin.login');
+        }
+
+        if (!empty($roles) && !in_array(auth()->user()->role, $roles)) {
             abort(403, 'Akses ditolak.');
         }
 

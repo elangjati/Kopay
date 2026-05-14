@@ -4,7 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Admin - Kopay</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50:  '#fdf8f3',
+                            100: '#f5e6d3',
+                            200: '#e8c9a0',
+                            300: '#d4a06a',
+                            400: '#c07840',
+                            500: '#8B4513',
+                            600: '#7a3c10',
+                            700: '#6b340e',
+                            800: '#1a3a1a',
+                            900: '#122812',
+                        }
+                    },
+                    animation: {
+                        'spin-slow': 'spin 1s linear infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+    <style>[x-cloak]{display:none!important}</style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4"
       style="background: linear-gradient(135deg, #122812 0%, #1a3a1a 40%, #2d1a0a 100%);">
@@ -36,7 +63,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('admin.login') }}" method="POST" class="space-y-5" x-data="{ loading: false }" @submit="loading = true">
+            <form action="{{ route('admin.login') }}" method="POST" class="space-y-5" x-data="{ loading: false }" @submit="loading = true; setTimeout(() => loading = false, 8000)">
                 @csrf
 
                 <div>

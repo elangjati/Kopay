@@ -1,21 +1,9 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
+// Migration ini tidak lagi diperlukan karena kolom qris_url sudah dihapus.
 return new class extends Migration {
-    public function up(): void
-    {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->text('qris_url')->nullable()->change();
-        });
-    }
-
-    public function down(): void
-    {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->string('qris_url')->nullable()->change();
-        });
-    }
+    public function up(): void {}
+    public function down(): void {}
 };

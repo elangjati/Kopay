@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
@@ -27,9 +28,14 @@ class MenuController extends Controller
             'price'        => 'required|numeric|min:0',
             'category'     => 'required|string',
             'is_available' => 'boolean',
+            'image'        => 'nullable|image|max:2048',
         ]);
 
         $data['is_available'] = $request->boolean('is_available', true);
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('menus', 'public');
+        }
 
         Menu::create($data);
 
@@ -49,9 +55,18 @@ class MenuController extends Controller
             'price'        => 'required|numeric|min:0',
             'category'     => 'required|string',
             'is_available' => 'boolean',
+            'image'        => 'nullable|image|max:2048',
         ]);
 
         $data['is_available'] = $request->boolean('is_available');
+
+        if ($request->hasFile('image')) {
+            // Hapus gambar lama sebelum simpan yang baru
+            if ($menu->image) {
+                Storage::disk('public')->delete($menu->image);
+            }
+            $data['image'] = $request->file('image')->store('menus', 'public');
+        }
 
         $menu->update($data);
 

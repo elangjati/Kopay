@@ -60,8 +60,14 @@ class ReportController extends Controller
             9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
         ];
 
+        $completedOrders = Order::with('items.menu')
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->where('status', 'completed')
+            ->latest()->get();
+
         return view('admin.reports.index', compact(
-            'summary', 'topItems', 'monthly', 'years', 'months', 'year', 'month'
+            'summary', 'topItems', 'monthly', 'years', 'months', 'year', 'month', 'completedOrders'
         ));
     }
 }
