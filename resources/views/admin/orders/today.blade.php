@@ -82,7 +82,7 @@
                 <td class="px-5 py-3.5 text-gray-500 text-xs capitalize">
                     {{ $order->payment_method ?? '—' }}
                 </td>
-                <td class="px-5 py-3.5 text-gray-400 text-xs">{{ $order->created_at->format('H:i') }}</td>
+                <td class="px-5 py-3.5 text-gray-400 text-xs">{{ $order->updated_at->format('H:i') }}</td>
                 <td class="px-5 py-3.5">
                     <div class="flex items-center gap-2">
                         @if($order->status === 'completed')
@@ -160,7 +160,7 @@
                 @if($order->payment_method)
                     <span class="text-xs text-gray-400 capitalize">{{ $order->payment_method }}</span>
                 @endif
-                <span class="text-xs text-gray-400">{{ $order->created_at->format('H:i') }}</span>
+                <span class="text-xs text-gray-400">{{ $order->updated_at->format('H:i') }}</span>
             </div>
             @if($order->status === 'completed')
                 <a href="{{ route('admin.orders.receipt', $order) }}"
