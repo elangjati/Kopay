@@ -280,6 +280,7 @@ function orderForm(initialItems, menus) {
         isDesktop: window.innerWidth >= 1024,
         submitting: false,
         payNow: true,
+        isCreate: {{ $isCreate ? 'true' : 'false' }},
         init() {
             const update = () => { this.isDesktop = window.innerWidth >= 1024; };
             window.addEventListener('resize', update);
@@ -304,8 +305,8 @@ function orderForm(initialItems, menus) {
         submitForm() {
             if (this.cart.length === 0) return;
 
-            // Kalau bayar sekarang, pastikan metode pembayaran dipilih
-            if (this.payNow) {
+            // Kalau bayar sekarang (mode create), pastikan metode pembayaran dipilih
+            if (this.isCreate && this.payNow) {
                 const method = document.querySelector('input[name="payment_method"]:checked');
                 if (!method) {
                     alert('Pilih metode pembayaran terlebih dahulu.');
