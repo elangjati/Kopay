@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin - Kopay')</title>
+    <title>@yield('title', 'Kasir - Kopay')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -41,7 +41,7 @@
                 <div class="flex items-center gap-2">
                     <img src="/images/logo.png" alt="Kopay" class="w-9 h-9 rounded object-cover">
                     <span class="font-bold text-base tracking-tight">Kopay</span>
-                    <span class="text-amber-300 text-xs">Admin</span>
+                    <span class="text-amber-300 text-xs capitalize">{{ auth()->user()?->role ?? 'Admin' }}</span>
                 </div>
                 {{-- Desktop nav --}}
                 <div class="hidden md:flex items-center gap-1">
