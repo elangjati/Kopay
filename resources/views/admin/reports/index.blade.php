@@ -12,34 +12,74 @@
 
 {{-- Filter --}}
 <form method="GET" action="{{ route('admin.reports.index') }}"
-      class="bg-white rounded-xl border border-gray-200 p-4 mb-6 flex flex-wrap gap-3 items-end shadow-sm">
-    <div>
-        <label class="block text-xs font-medium text-gray-700 mb-1.5">Tahun</label>
-        <select name="year"
-                class="border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white">
-            @foreach($years as $y)
-                <option value="{{ $y }}" {{ $y == $year ? 'selected' : '' }}>{{ $y }}</option>
-            @endforeach
-        </select>
+      class="bg-white rounded-xl border border-gray-200 p-4 mb-6 shadow-sm"
+      x-data="{ mode: '{{ $mode }}' }">
+
+    {{-- Mode toggle --}}
+    <div class="flex gap-2 mb-4">
+        <label class="cursor-pointer">
+            <input type="radio" name="mode" value="monthly" class="sr-only peer" x-model="mode"
+                   {{ $mode === 'monthly' ? 'checked' : '' }}>
+            <div class="px-4 py-2 rounded-lg text-sm font-medium border-2 transition
+                        peer-checked:border-primary-700 peer-checked:bg-primary-50 peer-checked:text-primary-800
+                        border-gray-200 text-gray-500 hover:border-gray-300">
+                Per Bulan
+            </div>
+        </label>
+        <label class="cursor-pointer">
+            <input type="radio" name="mode" value="daily" class="sr-only peer" x-model="mode"
+                   {{ $mode === 'daily' ? 'checked' : '' }}>
+            <div class="px-4 py-2 rounded-lg text-sm font-medium border-2 transition
+                        peer-checked:border-primary-700 peer-checked:bg-primary-50 peer-checked:text-primary-800
+                        border-gray-200 text-gray-500 hover:border-gray-300">
+                Per Hari
+            </div>
+        </label>
     </div>
-    <div>
-        <label class="block text-xs font-medium text-gray-700 mb-1.5">Bulan</label>
-        <select name="month"
-                class="border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white">
-            @foreach($months as $num => $name)
-                <option value="{{ $num }}" {{ $num == $month ? 'selected' : '' }}>{{ $name }}</option>
-            @endforeach
-        </select>
+
+    <div class="flex flex-wrap gap-3 items-end">
+        {{-- Filter bulanan --}}
+        <template x-if="mode === 'monthly'">
+            <div class="flex flex-wrap gap-3 items-end">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1.5">Tahun</label>
+                    <select name="year"
+                            class="border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white">
+                        @foreach($years as $y)
+                            <option value="{{ $y }}" {{ $y == $year ? 'selected' : '' }}>{{ $y }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1.5">Bulan</label>
+                    <select name="month"
+                            class="border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white">
+                        @foreach($months as $num => $name)
+                            <option value="{{ $num }}" {{ $num == $month ? 'selected' : '' }}>{{ $name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </template>
+
+        {{-- Filter harian --}}
+        <template x-if="mode === 'daily'">
+            <div>
+                <label class="block text-xs font-medium text-gray-700 mb-1.5">Tanggal</label>
+                <input type="date" name="date" value="{{ $date }}"
+                       class="border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white">
+            </div>
+        </template>
+
+        <button type="submit"
+                class="bg-primary-800 hover:bg-primary-900 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition shadow-sm">
+            Tampilkan
+        </button>
     </div>
-    <button type="submit"
-            class="bg-primary-800 hover:bg-primary-900 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition shadow-sm">
-        Tampilkan
-    </button>
 </form>
 
 {{-- Summary Cards --}}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-    {{-- Total Pesanan --}}
     <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
         <div class="flex items-center justify-between mb-2">
             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Pesanan Selesai</p>
@@ -50,10 +90,9 @@
             </div>
         </div>
         <p class="text-3xl font-bold text-gray-900">{{ $summary->total_orders ?? 0 }}</p>
-        <p class="text-xs text-gray-400 mt-1">{{ $months[$month] }} {{ $year }}</p>
+        <p class="text-xs text-gray-400 mt-1">{{ $periodLabel }}</p>
     </div>
 
-    {{-- Total Pendapatan --}}
     <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
         <div class="flex items-center justify-between mb-2">
             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Pendapatan</p>
@@ -64,10 +103,9 @@
             </div>
         </div>
         <p class="text-2xl font-bold text-green-600">Rp {{ number_format($summary->total_revenue ?? 0, 0, ',', '.') }}</p>
-        <p class="text-xs text-gray-400 mt-1">{{ $months[$month] }} {{ $year }}</p>
+        <p class="text-xs text-gray-400 mt-1">{{ $periodLabel }}</p>
     </div>
 
-    {{-- Tunai --}}
     <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
         <div class="flex items-center justify-between mb-2">
             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tunai</p>
@@ -81,7 +119,6 @@
         <p class="text-xs text-gray-400 mt-1">{{ $tunaiOrders }} pesanan</p>
     </div>
 
-    {{-- QRIS --}}
     <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
         <div class="flex items-center justify-between mb-2">
             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">QRIS</p>
@@ -95,7 +132,6 @@
         <p class="text-xs text-gray-400 mt-1">{{ $qrisOrders }} pesanan</p>
     </div>
 
-    {{-- Rata-rata --}}
     <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
         <div class="flex items-center justify-between mb-2">
             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Rata-rata / Pesanan</p>
@@ -108,11 +144,11 @@
         <p class="text-2xl font-bold text-gray-900">
             Rp {{ ($summary->total_orders ?? 0) > 0 ? number_format($summary->total_revenue / $summary->total_orders, 0, ',', '.') : 0 }}
         </p>
-        <p class="text-xs text-gray-400 mt-1">{{ $months[$month] }} {{ $year }}</p>
+        <p class="text-xs text-gray-400 mt-1">{{ $periodLabel }}</p>
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+<div class="grid grid-cols-1 {{ $mode === 'monthly' ? 'lg:grid-cols-2' : '' }} gap-5 mb-6">
 
     {{-- Top Items --}}
     <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
@@ -120,7 +156,7 @@
             <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
             </svg>
-            Menu Terlaris — {{ $months[$month] }} {{ $year }}
+            Menu Terlaris — {{ $periodLabel }}
         </h3>
         @forelse($topItems as $i => $item)
         <div class="flex items-center justify-between py-3 {{ $i < $topItems->count() - 1 ? 'border-b border-gray-100' : '' }}">
@@ -137,16 +173,14 @@
             </div>
         </div>
         @empty
-            <div class="text-center py-10">
-                <svg class="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                </svg>
-                <p class="text-sm text-gray-400">Belum ada data penjualan</p>
-            </div>
+        <div class="text-center py-10">
+            <p class="text-sm text-gray-400">Belum ada data penjualan</p>
+        </div>
         @endforelse
     </div>
 
-    {{-- Monthly Breakdown --}}
+    {{-- Grafik bulanan — hanya tampil di mode monthly --}}
+    @if($mode === 'monthly' && $monthly)
     <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
         <h3 class="text-sm font-semibold text-gray-700 mb-4">Rekap Per Bulan — {{ $year }}</h3>
         <div class="space-y-2.5">
@@ -169,14 +203,16 @@
             @endforeach
         </div>
     </div>
+    @endif
 </div>
 
 {{-- Orders Table --}}
 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
     <div class="px-5 py-4 border-b border-gray-100">
-        <h3 class="text-sm font-semibold text-gray-700">Detail Pesanan Selesai — {{ $months[$month] }} {{ $year }}</h3>
+        <h3 class="text-sm font-semibold text-gray-700">Detail Pesanan Selesai — {{ $periodLabel }}</h3>
     </div>
-    {{-- Desktop: table --}}
+
+    {{-- Desktop --}}
     <div class="hidden md:block">
         <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b border-gray-200">
@@ -185,6 +221,7 @@
                     <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Pelanggan</th>
                     <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Item</th>
                     <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</th>
+                    <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Bayar</th>
                     <th class="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Waktu</th>
                 </tr>
             </thead>
@@ -197,17 +234,13 @@
                         {{ $order->items->map(fn($i) => ($i->menu->name ?? 'Menu dihapus') . ' x' . $i->quantity)->join(', ') }}
                     </td>
                     <td class="px-5 py-3.5 font-semibold text-primary-700">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
+                    <td class="px-5 py-3.5 text-xs capitalize text-gray-500">{{ $order->payment_method ?? '—' }}</td>
                     <td class="px-5 py-3.5 text-gray-400 text-xs">{{ $order->created_at->format('d M, H:i') }}</td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="text-center py-12">
-                        <div class="text-gray-400">
-                            <svg class="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                            </svg>
-                            <p class="text-sm">Belum ada pesanan selesai bulan ini</p>
-                        </div>
+                    <td colspan="6" class="text-center py-12 text-gray-400">
+                        <p class="text-sm">Belum ada pesanan selesai periode ini</p>
                     </td>
                 </tr>
                 @endforelse
@@ -215,7 +248,7 @@
         </table>
     </div>
 
-    {{-- Mobile: card list --}}
+    {{-- Mobile --}}
     <div class="md:hidden divide-y divide-gray-100">
         @forelse($completedOrders as $order)
         <div class="p-4">
@@ -229,10 +262,13 @@
             <p class="text-xs text-gray-500 mb-1.5 truncate">
                 {{ $order->items->map(fn($i) => ($i->menu->name ?? 'Menu dihapus') . ' x' . $i->quantity)->join(', ') }}
             </p>
-            <p class="text-xs text-gray-400">{{ $order->created_at->format('d M Y, H:i') }}</p>
+            <div class="flex items-center justify-between">
+                <p class="text-xs text-gray-400">{{ $order->created_at->format('d M Y, H:i') }}</p>
+                <span class="text-xs capitalize text-gray-500">{{ $order->payment_method ?? '—' }}</span>
+            </div>
         </div>
         @empty
-        <div class="text-center text-gray-400 py-12 text-sm">Belum ada pesanan selesai bulan ini.</div>
+        <div class="text-center text-gray-400 py-12 text-sm">Belum ada pesanan selesai periode ini.</div>
         @endforelse
     </div>
 
