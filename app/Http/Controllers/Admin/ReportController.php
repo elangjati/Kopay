@@ -22,6 +22,20 @@ class ReportController extends Controller
             ->selectRaw('COUNT(*) as total_orders, SUM(total_price) as total_revenue')
             ->first();
 
+        // Breakdown pendapatan per metode bayar
+        $revenueByMethod = Order::whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->where('status', 'completed')
+            ->selectRaw('payment_method, COUNT(*) as total_orders, SUM(total_price) as total_revenue')
+            ->groupBy('payment_method')
+            ->get()
+            ->keyBy('payment_method');
+
+        $tunaiRevenue = $revenueByMethod->get('tunai')?->total_revenue ?? 0;
+        $qrisRevenue  = $revenueByMethod->get('qris')?->total_revenue ?? 0;
+        $tunaiOrders  = $revenueByMethod->get('tunai')?->total_orders ?? 0;
+        $qrisOrders   = $revenueByMethod->get('qris')?->total_orders ?? 0;
+
         // Top selling items this month
         $topItems = OrderItem::whereHas('order', function ($q) use ($year, $month) {
                 $q->whereYear('created_at', $year)
@@ -67,7 +81,8 @@ class ReportController extends Controller
             ->latest()->get();
 
         return view('admin.reports.index', compact(
-            'summary', 'topItems', 'monthly', 'years', 'months', 'year', 'month', 'completedOrders'
+            'summary', 'topItems', 'monthly', 'years', 'months', 'year', 'month', 'completedOrders',
+            'tunaiRevenue', 'qrisRevenue', 'tunaiOrders', 'qrisOrders'
         ));
     }
 }

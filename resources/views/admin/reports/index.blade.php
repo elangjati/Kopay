@@ -38,7 +38,8 @@
 </form>
 
 {{-- Summary Cards --}}
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+    {{-- Total Pesanan --}}
     <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
         <div class="flex items-center justify-between mb-2">
             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Pesanan Selesai</p>
@@ -51,6 +52,8 @@
         <p class="text-3xl font-bold text-gray-900">{{ $summary->total_orders ?? 0 }}</p>
         <p class="text-xs text-gray-400 mt-1">{{ $months[$month] }} {{ $year }}</p>
     </div>
+
+    {{-- Total Pendapatan --}}
     <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
         <div class="flex items-center justify-between mb-2">
             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Pendapatan</p>
@@ -60,9 +63,39 @@
                 </svg>
             </div>
         </div>
-        <p class="text-3xl font-bold text-green-600">Rp {{ number_format($summary->total_revenue ?? 0, 0, ',', '.') }}</p>
+        <p class="text-2xl font-bold text-green-600">Rp {{ number_format($summary->total_revenue ?? 0, 0, ',', '.') }}</p>
         <p class="text-xs text-gray-400 mt-1">{{ $months[$month] }} {{ $year }}</p>
     </div>
+
+    {{-- Tunai --}}
+    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tunai</p>
+            <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+            </div>
+        </div>
+        <p class="text-2xl font-bold text-emerald-600">Rp {{ number_format($tunaiRevenue, 0, ',', '.') }}</p>
+        <p class="text-xs text-gray-400 mt-1">{{ $tunaiOrders }} pesanan</p>
+    </div>
+
+    {{-- QRIS --}}
+    <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">QRIS</p>
+            <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                </svg>
+            </div>
+        </div>
+        <p class="text-2xl font-bold text-blue-600">Rp {{ number_format($qrisRevenue, 0, ',', '.') }}</p>
+        <p class="text-xs text-gray-400 mt-1">{{ $qrisOrders }} pesanan</p>
+    </div>
+
+    {{-- Rata-rata --}}
     <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
         <div class="flex items-center justify-between mb-2">
             <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Rata-rata / Pesanan</p>
@@ -72,7 +105,7 @@
                 </svg>
             </div>
         </div>
-        <p class="text-3xl font-bold text-gray-900">
+        <p class="text-2xl font-bold text-gray-900">
             Rp {{ ($summary->total_orders ?? 0) > 0 ? number_format($summary->total_revenue / $summary->total_orders, 0, ',', '.') : 0 }}
         </p>
         <p class="text-xs text-gray-400 mt-1">{{ $months[$month] }} {{ $year }}</p>
@@ -143,14 +176,6 @@
     <div class="px-5 py-4 border-b border-gray-100">
         <h3 class="text-sm font-semibold text-gray-700">Detail Pesanan Selesai — {{ $months[$month] }} {{ $year }}</h3>
     </div>
-    @php
-        $completedOrders = \App\Models\Order::with('items.menu')
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            ->where('status', 'completed')
-            ->latest()->get();
-    @endphp
-
     {{-- Desktop: table --}}
     <div class="hidden md:block">
         <table class="w-full text-sm">
@@ -169,7 +194,7 @@
                     <td class="px-5 py-3.5 text-gray-400 text-xs font-mono">#{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</td>
                     <td class="px-5 py-3.5 font-medium text-gray-900">{{ $order->customer_name }}</td>
                     <td class="px-5 py-3.5 text-gray-500 text-xs max-w-[200px] truncate">
-                        {{ $order->items->map(fn($i) => ($i->menu->name ?? '?') . ' x' . $i->quantity)->join(', ') }}
+                        {{ $order->items->map(fn($i) => ($i->menu->name ?? 'Menu dihapus') . ' x' . $i->quantity)->join(', ') }}
                     </td>
                     <td class="px-5 py-3.5 font-semibold text-primary-700">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
                     <td class="px-5 py-3.5 text-gray-400 text-xs">{{ $order->created_at->format('d M, H:i') }}</td>
@@ -202,7 +227,7 @@
                 <span class="font-bold text-primary-700 text-sm">Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
             </div>
             <p class="text-xs text-gray-500 mb-1.5 truncate">
-                {{ $order->items->map(fn($i) => ($i->menu->name ?? '?') . ' x' . $i->quantity)->join(', ') }}
+                {{ $order->items->map(fn($i) => ($i->menu->name ?? 'Menu dihapus') . ' x' . $i->quantity)->join(', ') }}
             </p>
             <p class="text-xs text-gray-400">{{ $order->created_at->format('d M Y, H:i') }}</p>
         </div>
