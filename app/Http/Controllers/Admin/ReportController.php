@@ -78,7 +78,9 @@ class ReportController extends Controller
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->where('status', 'completed')
-            ->latest()->get();
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
 
         return view('admin.reports.index', compact(
             'summary', 'topItems', 'monthly', 'years', 'months', 'year', 'month', 'completedOrders',

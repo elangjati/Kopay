@@ -235,5 +235,12 @@
         <div class="text-center text-gray-400 py-12 text-sm">Belum ada pesanan selesai bulan ini.</div>
         @endforelse
     </div>
+
+    {{-- Pagination --}}
+    @if($completedOrders->hasPages())
+    <div class="px-5 py-4 border-t border-gray-100">
+        {{ $completedOrders->links() }}
+    </div>
+    @endif
 </div>
 @endsection

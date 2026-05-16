@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,5 +22,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Suppress deprecation warnings from third-party packages (e.g. google/apiclient on PHP 8.4)
         error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
+        Paginator::useTailwind();
     }
 }
