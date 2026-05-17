@@ -33,8 +33,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [KasirController::class, 'index'])->name('dashboard');
 
         // Kasir
-        Route::get('/kasir/create', [KasirController::class, 'create'])->name('kasir.create');
-        Route::post('/kasir',       [KasirController::class, 'store'])->name('kasir.store');
+        Route::get('/kasir/create',        [KasirController::class, 'create'])->name('kasir.create');
+        Route::post('/kasir',              [KasirController::class, 'store'])->name('kasir.store');
+        Route::get('/kasir/daily-report',  [KasirController::class, 'dailyReport'])->name('kasir.daily-report');
 
         // Orders
         Route::get('/orders/today',            [OrderController::class, 'today'])->name('orders.today');

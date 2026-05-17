@@ -87,4 +87,27 @@ class KasirController extends Controller
             \Log::error('Google Sheets error: ' . $e->getMessage());
         }
     }
+
+    public function dailyReport(Request $request)
+    {
+        $date = $request->get('date', today()->toDateString());
+
+        $orders = Order::with('items.menu')
+            ->whereDate('created_at', $date)
+            ->where('status', 'completed')
+            ->latest()
+            ->get();
+
+        $totalOrders  = $orders->count();
+        $totalRevenue = $orders->sum('total_price');
+        $tunaiRevenue = $orders->where('payment_method', 'tunai')->sum('total_price');
+        $qrisRevenue  = $orders->where('payment_method', 'qris')->sum('total_price');
+        $tunaiOrders  = $orders->where('payment_method', 'tunai')->count();
+        $qrisOrders   = $orders->where('payment_method', 'qris')->count();
+
+        return view('admin.kasir.daily-report', compact(
+            'orders', 'date', 'totalOrders', 'totalRevenue',
+            'tunaiRevenue', 'qrisRevenue', 'tunaiOrders', 'qrisOrders'
+        ));
+    }
 }
