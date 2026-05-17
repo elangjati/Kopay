@@ -13,10 +13,15 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $mode  = $request->get('mode', 'monthly'); // 'monthly' | 'daily'
+        $mode  = $request->get('mode', 'monthly');
         $year  = (int) $request->get('year', now()->year);
         $month = (int) $request->get('month', now()->month);
-        $date  = $request->get('date', now()->toDateString()); // YYYY-MM-DD
+        $date  = $request->get('date', now()->toDateString());
+        try {
+            $date = \Carbon\Carbon::parse($date)->toDateString();
+        } catch (\Exception $e) {
+            $date = now()->toDateString();
+        }
 
         $months = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',

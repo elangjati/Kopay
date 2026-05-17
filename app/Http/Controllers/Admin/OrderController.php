@@ -41,7 +41,8 @@ class OrderController extends Controller
         $newItems = [];
 
         foreach ($request->items as $item) {
-            $menu      = Menu::findOrFail($item['menu_id']);
+            $menu = Menu::find($item['menu_id']);
+            if (!$menu) continue; // skip menu yang sudah dihapus
             $total    += $menu->price * $item['quantity'];
             $newItems[] = [
                 'menu_id'  => $menu->id,
@@ -50,16 +51,23 @@ class OrderController extends Controller
             ];
         }
 
-        $order->update([
-            'customer_name' => $request->customer_name,
-            'notes'         => $request->notes,
-            'total_price'   => $total,
-        ]);
-
-        $order->items()->delete();
-        foreach ($newItems as $item) {
-            $order->items()->create($item);
+        if (empty($newItems)) {
+            return back()->withErrors(['items' => 'Semua menu yang dipilih sudah tidak tersedia.']);
         }
+
+        // Gunakan transaction agar data tidak rusak jika gagal di tengah jalan
+        \DB::transaction(function () use ($order, $request, $total, $newItems) {
+            $order->update([
+                'customer_name' => $request->customer_name,
+                'notes'         => $request->notes,
+                'total_price'   => $total,
+            ]);
+
+            $order->items()->delete();
+            foreach ($newItems as $item) {
+                $order->items()->create($item);
+            }
+        });
 
         return redirect()->route('admin.kasir.create')->with('success', "Pesanan #{$order->id} berhasil diperbarui.");
     }

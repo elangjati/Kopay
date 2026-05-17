@@ -90,7 +90,13 @@ class KasirController extends Controller
 
     public function dailyReport(Request $request)
     {
+        // Validasi format tanggal, fallback ke hari ini kalau invalid
         $date = $request->get('date', today()->toDateString());
+        try {
+            $date = \Carbon\Carbon::parse($date)->toDateString();
+        } catch (\Exception $e) {
+            $date = today()->toDateString();
+        }
 
         $orders = Order::with('items.menu')
             ->whereDate('created_at', $date)
