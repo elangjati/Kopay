@@ -54,26 +54,35 @@ class KasirController extends Controller
             $orderItems[] = ['menu_id' => $menu->id, 'quantity' => $item['quantity'], 'price' => $menu->price];
         }
 
-        $payNow = $request->boolean('pay_now', true);
+        // pay_now hanya true kalau eksplisit dikirim sebagai '1'
+        $payNow = $request->input('pay_now') === '1';
 
-        $order = Order::create([
-            'customer_name'  => $request->customer_name,
-            'notes'          => $request->notes,
-            'total_price'    => $total,
-            'status'         => $payNow ? 'completed' : 'pending',
-            'payment_method' => $payNow ? $request->payment_method : null,
-        ]);
-
-        foreach ($orderItems as $item) {
-            $order->items()->create($item);
+        // Kalau bayar sekarang, payment_method wajib ada
+        if ($payNow && !$request->filled('payment_method')) {
+            return back()->withErrors(['payment_method' => 'Pilih metode pembayaran.'])->withInput();
         }
+
+        $order = \DB::transaction(function () use ($request, $total, $orderItems, $payNow) {
+            $order = Order::create([
+                'customer_name'  => $request->customer_name,
+                'notes'          => $request->notes,
+                'total_price'    => $total,
+                'status'         => $payNow ? 'completed' : 'pending',
+                'payment_method' => $payNow ? $request->payment_method : null,
+            ]);
+
+            foreach ($orderItems as $item) {
+                $order->items()->create($item);
+            }
+
+            return $order;
+        });
 
         if ($payNow) {
             $this->syncSheets($order);
             return redirect()->route('admin.orders.receipt', $order->id);
         }
 
-        // Bayar nanti — ke riwayat hari ini
         return redirect()->route('admin.orders.today')
             ->with('success', "Pesanan #{$order->id} dibuat. Menunggu pembayaran.");
     }

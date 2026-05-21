@@ -88,6 +88,10 @@ class OrderController extends Controller
 
         // Update metode bayar jika dikirim dari form konfirmasi
         if ($request->filled('payment_method')) {
+            // Validasi nilai agar tidak crash ENUM di database
+            if (!in_array($request->payment_method, ['tunai', 'qris'])) {
+                return back()->withErrors(['payment_method' => 'Metode pembayaran tidak valid.']);
+            }
             $data['payment_method'] = $request->payment_method;
         }
 

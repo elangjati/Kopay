@@ -29,8 +29,8 @@ class GoogleSheetsService
         $credentialsPath = storage_path('app/google-credentials.json');
 
         // Kalau ada di env variable, tulis ke file sementara
-        if (empty(file_exists($credentialsPath)) && env('GOOGLE_CREDENTIALS_JSON')) {
-            file_put_contents($credentialsPath, env('GOOGLE_CREDENTIALS_JSON'));
+        if (!file_exists($credentialsPath) && config('services.google_sheets.credentials_json')) {
+            file_put_contents($credentialsPath, config('services.google_sheets.credentials_json'));
         }
 
         if (!file_exists($credentialsPath)) {
