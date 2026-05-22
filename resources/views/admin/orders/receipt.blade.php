@@ -42,12 +42,19 @@
         </svg>
         Pesanan Baru
     </a>
+    <button onclick="printViaRawBT()"
+            class="flex items-center justify-center gap-2 w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-xl transition text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+        </svg>
+        Print via RawBT
+    </button>
     <button onclick="window.print()"
             class="flex items-center justify-center gap-2 w-full mt-2 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-xl transition text-sm">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
         </svg>
-        Cetak Struk
+        Cetak Struk (Browser)
     </button>
 </div>
 
@@ -116,6 +123,49 @@
 </div>
 
 <script>
+    function printViaRawBT() {
+        // Generate teks struk
+        const lines = [];
+        const sep  = '--------------------------------';
+        const sep2 = '================================';
+
+        lines.push('\x1B\x61\x01'); // center align
+        lines.push('KOPAY\n');
+        lines.push('Terima kasih atas kunjungan Anda\n');
+        lines.push(sep2 + '\n');
+
+        lines.push('\x1B\x61\x00'); // left align
+        lines.push('No. Struk : #{{ str_pad($order->id, 4, "0", STR_PAD_LEFT) }}\n');
+        lines.push('Tanggal   : {{ $order->created_at->format("d/m/Y H:i") }}\n');
+        lines.push('Pelanggan : {{ $order->customer_name }}\n');
+        lines.push('Pembayaran: {{ strtoupper($order->payment_method ?? "TUNAI") }}\n');
+        lines.push(sep + '\n');
+
+        @foreach($order->items as $item)
+        lines.push('{{ addslashes($item->menu->name ?? "Menu dihapus") }}\n');
+        lines.push('  {{ $item->quantity }} x Rp {{ number_format($item->price, 0, ",", ".") }}    Rp {{ number_format($item->price * $item->quantity, 0, ",", ".") }}\n');
+        @endforeach
+
+        lines.push(sep + '\n');
+        lines.push('\x1B\x61\x02'); // right align
+        lines.push('TOTAL: Rp {{ number_format($order->total_price, 0, ",", ".") }}\n');
+
+        @if($order->notes)
+        lines.push('\x1B\x61\x00'); // left align
+        lines.push(sep + '\n');
+        lines.push('Catatan: {{ addslashes($order->notes) }}\n');
+        @endif
+
+        lines.push('\x1B\x61\x01'); // center align
+        lines.push(sep2 + '\n');
+        lines.push('Sampai jumpa lagi!\n');
+        lines.push('\n\n\n'); // feed paper
+
+        const text = lines.join('');
+        const encoded = btoa(unescape(encodeURIComponent(text)));
+        window.location.href = 'rawbt:base64,' + encoded;
+    }
+
     @if(!request()->has('noauto'))
     window.addEventListener('load', function() {
         setTimeout(() => window.print(), 500);
