@@ -7,9 +7,28 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         @media print {
-            body { background: white !important; padding: 0 !important; }
+            @page {
+                size: 58mm auto;
+                margin: 0;
+            }
+            * {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 58mm !important;
+            }
             .no-print { display: none !important; }
-            .receipt-wrapper { box-shadow: none !important; border: none !important; }
+            .receipt-wrapper {
+                box-shadow: none !important;
+                border: none !important;
+                width: 58mm !important;
+                min-width: unset !important;
+                max-width: 58mm !important;
+            }
         }
     </style>
 </head>
