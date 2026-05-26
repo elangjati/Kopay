@@ -120,9 +120,24 @@ class KasirController extends Controller
         $tunaiOrders  = $orders->where('payment_method', 'tunai')->count();
         $qrisOrders   = $orders->where('payment_method', 'qris')->count();
 
+        // Rekap produk terjual
+        $productSummary = $orders->flatMap->items
+            ->groupBy('menu_id')
+            ->map(function ($items) {
+                $first = $items->first();
+                return [
+                    'name'     => $first->menu->name ?? 'Menu dihapus',
+                    'qty'      => $items->sum('quantity'),
+                    'revenue'  => $items->sum(fn($i) => $i->price * $i->quantity),
+                ];
+            })
+            ->sortByDesc('qty')
+            ->values();
+
         return view('admin.kasir.daily-report', compact(
             'orders', 'date', 'totalOrders', 'totalRevenue',
-            'tunaiRevenue', 'qrisRevenue', 'tunaiOrders', 'qrisOrders'
+            'tunaiRevenue', 'qrisRevenue', 'tunaiOrders', 'qrisOrders',
+            'productSummary'
         ));
     }
 }
