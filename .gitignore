@@ -2,6 +2,7 @@
 .DS_Store
 .env
 .env.backup
+*.sql
 .env.production
 .env.railway
 .phpactor.json
@@ -15,7 +16,6 @@
 /.zed
 /auth.json
 /node_modules
-/public/build
 /public/hot
 /public/storage
 /storage/*.key
