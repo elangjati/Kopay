@@ -147,10 +147,10 @@
                         <div class="flex gap-1.5 justify-end">
                             @if($order->status === 'completed')
                             <a href="{{ route('admin.orders.receipt', $order) }}" class="text-xs border border-gray-300 hover:bg-gray-50 text-gray-600 px-2.5 py-1.5 rounded-lg transition">Struk</a>
-                            @elseif($order->status === 'pending' && $order->payment_method === 'qris')
-                            <a href="{{ route('admin.kasir.qris', $order) }}" class="text-xs border border-primary-300 hover:bg-primary-50 text-primary-700 px-2.5 py-1.5 rounded-lg transition">Bayar</a>
                             @endif
+                            @if($order->status === 'pending')
                             <a href="{{ route('admin.orders.edit', $order) }}" class="text-xs border border-gray-300 hover:bg-gray-50 text-gray-600 px-2.5 py-1.5 rounded-lg transition">Edit</a>
+                            @endif
                         </div>
                     </td>
                 </tr>
@@ -193,10 +193,10 @@
             <div class="flex gap-2 pt-2 border-t border-gray-100">
                 @if($order->status === 'completed')
                 <a href="{{ route('admin.orders.receipt', $order) }}" class="flex-1 text-center text-xs border border-gray-300 hover:bg-gray-50 text-gray-600 py-1.5 rounded-lg transition">Struk</a>
-                @elseif($order->status === 'pending' && $order->payment_method === 'qris')
-                <a href="{{ route('admin.kasir.qris', $order) }}" class="flex-1 text-center text-xs border border-primary-300 hover:bg-primary-50 text-primary-700 py-1.5 rounded-lg transition">Bayar</a>
                 @endif
+                @if($order->status === 'pending')
                 <a href="{{ route('admin.orders.edit', $order) }}" class="flex-1 text-center text-xs border border-gray-300 hover:bg-gray-50 text-gray-600 py-1.5 rounded-lg transition">Edit</a>
+                @endif
             </div>
         </div>
         @empty

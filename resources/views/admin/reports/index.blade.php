@@ -75,6 +75,13 @@
                 class="bg-primary-800 hover:bg-primary-900 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition shadow-sm">
             Tampilkan
         </button>
+        <a href="{{ route('admin.reports.export', array_merge(request()->query(), [])) }}"
+           class="flex items-center gap-2 border border-primary-800 text-primary-800 hover:bg-primary-50 text-sm font-medium px-5 py-2.5 rounded-xl transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            Export CSV
+        </a>
     </div>
 </form>
 

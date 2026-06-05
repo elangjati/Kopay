@@ -107,6 +107,17 @@ class OrderController extends Controller
         return redirect()->route('admin.orders.receipt', $order->id);
     }
 
+    public function changePayment(Request $request, Order $order)
+    {
+        $request->validate([
+            'payment_method' => 'required|in:tunai,qris',
+        ]);
+
+        $order->update(['payment_method' => $request->payment_method]);
+
+        return back()->with('success', "Metode pembayaran pesanan #{$order->id} diubah ke " . strtoupper($request->payment_method) . '.');
+    }
+
     public function destroy(Order $order)
     {
         $order->delete();

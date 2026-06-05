@@ -114,4 +114,65 @@ class ReportController extends Controller
             'periodLabel'
         ));
     }
+
+    public function export(Request $request)
+    {
+        $mode  = $request->get('mode', 'monthly');
+        $year  = (int) $request->get('year', now()->year);
+        $month = (int) $request->get('month', now()->month);
+        $date  = $request->get('date', now()->toDateString());
+        try {
+            $date = \Carbon\Carbon::parse($date)->toDateString();
+        } catch (\Exception $e) {
+            $date = now()->toDateString();
+        }
+
+        $months = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        ];
+
+        $query = Order::with('items.menu')->where('status', 'completed');
+        if ($mode === 'daily') {
+            $query->whereDate('created_at', $date);
+            $filename = 'laporan-' . $date . '.csv';
+        } else {
+            $query->whereYear('created_at', $year)->whereMonth('created_at', $month);
+            $filename = 'laporan-' . strtolower($months[$month]) . '-' . $year . '.csv';
+        }
+
+        $orders = $query->latest()->get();
+
+        $headers = [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($orders) {
+            $handle = fopen('php://output', 'w');
+
+            // BOM untuk Excel agar bisa baca karakter Indonesia
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            // Header kolom
+            fputcsv($handle, ['ID Pesanan', 'Tanggal', 'Nama Pelanggan', 'Item Pesanan', 'Total (Rp)', 'Metode Bayar']);
+
+            foreach ($orders as $order) {
+                $items = $order->items->map(fn($i) => ($i->menu->name ?? 'Menu dihapus') . ' x' . $i->quantity)->join(', ');
+                fputcsv($handle, [
+                    '#' . str_pad($order->id, 4, '0', STR_PAD_LEFT),
+                    $order->created_at->format('d/m/Y H:i'),
+                    $order->customer_name,
+                    $items,
+                    $order->total_price,
+                    strtoupper($order->payment_method ?? '-'),
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

@@ -42,6 +42,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/orders/{order}/edit',     [OrderController::class, 'edit'])->name('orders.edit');
         Route::put('/orders/{order}',          [OrderController::class, 'update'])->name('orders.update');
         Route::post('/orders/{order}/complete',[OrderController::class, 'complete'])->name('orders.complete');
+        Route::post('/orders/{order}/change-payment',[OrderController::class, 'changePayment'])->name('orders.change-payment');
         Route::get('/orders/{order}/receipt',  [OrderController::class, 'receipt'])->name('orders.receipt');
         Route::delete('/orders/{order}',       [OrderController::class, 'destroy'])->name('orders.destroy');
 
@@ -50,7 +51,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Reports — owner only
         Route::middleware('role:owner')->group(function () {
-            Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+            Route::get('/reports',        [ReportController::class, 'index'])->name('reports.index');
+            Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
         });
     });
 });

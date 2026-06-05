@@ -83,5 +83,10 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "audit": {
+        "ignore": {
+            "PKSA-y2cr-5h3j-g3ys": "firebase/php-jwt advisory"
+        }
+    }
 }

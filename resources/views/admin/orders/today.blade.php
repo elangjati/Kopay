@@ -90,6 +90,20 @@
                                class="text-xs font-medium text-primary-700 hover:text-primary-900 transition">
                                 Cetak Struk
                             </a>
+                            <form action="{{ route('admin.orders.change-payment', $order) }}" method="POST"
+                                  class="flex items-center gap-1"
+                                  onsubmit="return confirm('Ubah metode pembayaran pesanan #{{ $order->id }}?')">
+                                @csrf
+                                <select name="payment_method"
+                                        class="text-xs border border-gray-300 rounded-lg px-2 py-1 focus:outline-none bg-white">
+                                    <option value="tunai" {{ $order->payment_method === 'tunai' ? 'selected' : '' }}>Tunai</option>
+                                    <option value="qris" {{ $order->payment_method === 'qris' ? 'selected' : '' }}>QRIS</option>
+                                </select>
+                                <button type="submit"
+                                        class="text-xs font-semibold text-white px-2.5 py-1 rounded-lg bg-orange-500 hover:bg-orange-600">
+                                    Ganti
+                                </button>
+                            </form>
                         @elseif($order->status === 'pending')
                             <a href="{{ route('admin.orders.edit', $order) }}"
                                class="text-xs font-medium text-gray-600 hover:text-gray-900 transition">
@@ -163,14 +177,29 @@
                 <span class="text-xs text-gray-400">{{ $order->updated_at->format('H:i') }}</span>
             </div>
             @if($order->status === 'completed')
-                <a href="{{ route('admin.orders.receipt', $order) }}"
-                   class="text-xs font-medium text-primary-700 hover:text-primary-900 transition flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M17 17H17.01M17 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/>
-                    </svg>
-                    Cetak Struk
-                </a>
+                <div class="flex items-center gap-2 flex-wrap justify-end">
+                    <a href="{{ route('admin.orders.receipt', $order) }}"
+                       class="text-xs font-medium text-primary-700 hover:text-primary-900 transition flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M17 17H17.01M17 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/>
+                        </svg>
+                        Cetak Struk
+                    </a>
+                    <form action="{{ route('admin.orders.change-payment', $order) }}" method="POST"
+                          class="flex items-center gap-1"
+                          onsubmit="return confirm('Ubah metode pembayaran?')">
+                        @csrf
+                        <select name="payment_method"
+                                class="text-xs border border-gray-300 rounded-lg px-2 py-1 focus:outline-none bg-white">
+                            <option value="tunai" {{ $order->payment_method === 'tunai' ? 'selected' : '' }}>Tunai</option>
+                            <option value="qris" {{ $order->payment_method === 'qris' ? 'selected' : '' }}>QRIS</option>
+                        </select>
+                        <button type="submit" class="text-xs font-semibold text-white px-2.5 py-1 rounded-lg bg-orange-500 hover:bg-orange-600">
+                            Ganti
+                        </button>
+                    </form>
+                </div>
             @elseif($order->status === 'pending')
                 <div class="flex flex-col gap-2 items-end">
                     <div class="flex gap-2">
