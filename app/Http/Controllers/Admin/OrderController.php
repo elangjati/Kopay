@@ -107,6 +107,35 @@ class OrderController extends Controller
         return redirect()->route('admin.orders.receipt', $order->id);
     }
 
+    public function history(Request $request)
+    {
+        $tab    = $request->get('tab', 'pending'); // default tab pending
+        $search = $request->get('search', '');
+
+        $pendingOrders = Order::with('items.menu')
+            ->where('status', 'pending')
+            ->when($search, fn($q) => $q->where('customer_name', 'like', "%{$search}%"))
+            ->latest()
+            ->paginate(20, ['*'], 'pending_page')
+            ->withQueryString();
+
+        $completedOrders = Order::with('items.menu')
+            ->where('status', 'completed')
+            ->when($search, fn($q) => $q->where('customer_name', 'like', "%{$search}%"))
+            ->latest()
+            ->paginate(20, ['*'], 'completed_page')
+            ->withQueryString();
+
+        $totalPending   = Order::where('status', 'pending')->count();
+        $totalCompleted = Order::where('status', 'completed')->count();
+
+        return view('admin.orders.history', compact(
+            'pendingOrders', 'completedOrders',
+            'totalPending', 'totalCompleted',
+            'tab', 'search'
+        ));
+    }
+
     public function changePayment(Request $request, Order $order)
     {
         $request->validate([

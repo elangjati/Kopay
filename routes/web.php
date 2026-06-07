@@ -39,6 +39,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Orders
         Route::get('/orders/today',            [OrderController::class, 'today'])->name('orders.today');
+        Route::get('/orders/history',          [OrderController::class, 'history'])->name('orders.history');
         Route::get('/orders/{order}/edit',     [OrderController::class, 'edit'])->name('orders.edit');
         Route::put('/orders/{order}',          [OrderController::class, 'update'])->name('orders.update');
         Route::post('/orders/{order}/complete',[OrderController::class, 'complete'])->name('orders.complete');

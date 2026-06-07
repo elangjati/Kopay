@@ -66,6 +66,11 @@
                               {{ request()->routeIs('admin.orders.today') ? 'bg-primary-700 text-white' : 'text-primary-200 hover:bg-primary-800 hover:text-white' }}">
                         Riwayat Hari Ini
                     </a>
+                    <a href="{{ route('admin.orders.history') }}"
+                       class="px-3 py-2 rounded text-sm font-medium transition
+                              {{ request()->routeIs('admin.orders.history') ? 'bg-primary-700 text-white' : 'text-primary-200 hover:bg-primary-800 hover:text-white' }}">
+                        Riwayat Pesanan
+                    </a>
                     <a href="{{ route('admin.menus.index') }}"
                        class="px-3 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1.5
                               {{ request()->routeIs('admin.menus*') ? 'bg-primary-700 text-white shadow-sm' : 'text-primary-200 hover:bg-primary-700/50 hover:text-white' }}">
@@ -147,6 +152,11 @@
                    class="block px-3 py-2.5 rounded text-sm font-medium transition
                           {{ request()->routeIs('admin.orders.today') ? 'bg-primary-700 text-white' : 'text-primary-200 hover:bg-primary-800 hover:text-white' }}">
                     Riwayat Hari Ini
+                </a>
+                <a href="{{ route('admin.orders.history') }}"
+                   class="block px-3 py-2.5 rounded text-sm font-medium transition
+                          {{ request()->routeIs('admin.orders.history') ? 'bg-primary-700 text-white' : 'text-primary-200 hover:bg-primary-800 hover:text-white' }}">
+                    Riwayat Pesanan
                 </a>
                 <a href="{{ route('admin.menus.index') }}"
                    class="block px-3 py-2.5 rounded-lg text-sm font-medium transition flex items-center gap-2
