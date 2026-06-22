@@ -149,7 +149,64 @@ class OrderController extends Controller
 
     public function destroy(Order $order)
     {
+        // Hanya pesanan completed yang boleh dihapus
+        if ($order->status !== 'completed') {
+            return back()->withErrors(['error' => 'Hanya pesanan yang sudah selesai yang bisa dihapus.']);
+        }
+
+        // Log untuk audit trail
+        $orderData = [
+            'id'           => $order->id,
+            'customer_name'=> $order->customer_name,
+            'total_price'  => $order->total_price,
+            'status'       => $order->status,
+            'payment_method' => $order->payment_method,
+            'items'        => $order->items->map(fn($i) => [
+                'menu_id'  => $i->menu_id,
+                'quantity' => $i->quantity,
+                'price'    => $i->price,
+            ])->toArray(),
+            'deleted_by'   => auth()->user()->id,
+            'deleted_at'   => now(),
+        ];
+        \Log::info('Order deleted by owner', $orderData);
+
+        // Soft delete
         $order->delete();
-        return redirect()->route('admin.kasir.create')->with('success', 'Pesanan dihapus.');
+        
+        return back()->with('success', "Pesanan #{$order->id} berhasil dihapus. Owner dapat memulihkan di menu trash.");
+    }
+
+    public function restore(Order $order)
+    {
+        // Restore order yang sudah dihapus
+        if (!$order->trashed()) {
+            return back()->withErrors(['error' => 'Pesanan ini belum dihapus.']);
+        }
+
+        $order->restore();
+
+        \Log::info('Order restored by owner', [
+            'id' => $order->id,
+            'restored_by' => auth()->user()->id,
+            'restored_at' => now(),
+        ]);
+
+        return back()->with('success', "Pesanan #{$order->id} berhasil dipulihkan.");
+    }
+
+    public function trash(Request $request)
+    {
+        // Dashboard trash untuk owner melihat deleted orders
+        $search = $request->get('search', '');
+
+        $trashedOrders = Order::onlyTrashed()
+            ->with('items.menu')
+            ->when($search, fn($q) => $q->where('customer_name', 'like', "%{$search}%"))
+            ->latest('deleted_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.orders.trash', compact('trashedOrders', 'search'));
     }
 }

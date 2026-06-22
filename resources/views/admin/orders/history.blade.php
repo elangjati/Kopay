@@ -232,6 +232,15 @@
                                         Ganti
                                     </button>
                                 </form>
+                                @if(auth()->user()->role === 'owner')
+                                <form action="{{ route('admin.orders.destroy', $order) }}" method="POST"
+                                      onsubmit="return confirm('Yakin hapus pesanan #{{ $order->id }}? Data ini tidak bisa dikembalikan.')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="text-xs font-medium text-red-500 hover:text-red-700 transition">
+                                        Hapus
+                                    </button>
+                                </form>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -275,6 +284,15 @@
                             Ganti
                         </button>
                     </form>
+                    @if(auth()->user()->role === 'owner')
+                    <form action="{{ route('admin.orders.destroy', $order) }}" method="POST"
+                          onsubmit="return confirm('Yakin hapus pesanan #{{ $order->id }}?')">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="text-xs font-medium text-red-500 hover:text-red-700 transition">
+                            Hapus
+                        </button>
+                    </form>
+                    @endif
                 </div>
             </div>
             @endforeach
